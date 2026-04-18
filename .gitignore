@@ -1,0 +1,33 @@
+
+# Fyrox 專案管理器生成的預設模板
+/target
+*.log
+
+# AI 生成的
+# VS Code
+# /.vscode/
+# IntelliJ 或 RustRover
+/.idea/
+# 編輯器產生的備份檔
+*.rs.bk
+
+# 快取
+# 編輯器的快取
+/.fyrox/
+# 編輯器的個人偏好設定
+*.editor.settings
+
+# 如果是程式庫/Library則需要忽略
+# Cargo.lock
+# 發佈 Crate 時產生的原始備份
+**/Cargo.toml.orig
+
+# (macOS 專用) 資料夾索引檔
+# .DS_Store
+# (Windows 專用) 縮圖快取
+Thumbs.db
+.env
+
+# 自己寫的
+**/target
+/settings.ron

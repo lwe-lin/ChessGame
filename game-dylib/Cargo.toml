@@ -1,0 +1,15 @@
+
+[package]
+name = "game_dylib"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+chessgame = { path = "../game", default-features = false }
+
+[features]
+default = ["chessgame/default"]
+dylib-engine = ["chessgame/dylib-engine"]
