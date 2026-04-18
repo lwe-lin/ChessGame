@@ -6,3 +6,4 @@ Makefile linguist-generated
 *.html linguist-generated
 *.css linguist-generated
 *.js linguist-generated
+*.nix linguist-generated
