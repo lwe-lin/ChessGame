@@ -1,10 +1,12 @@
 //! Game project.
+
+use std::fs::read_to_string;
 #[allow(unused_imports)]
 use fyrox::graph::prelude::*;
 use fyrox::{
-    core::pool::Handle, core::visitor::prelude::*, core::reflect::prelude::*,
+    core::pool::Handle, core::visitor::prelude::*, core::reflect::prelude::*, core::log::Log,
     event::Event,
-    gui::{message::UiMessage, UserInterface},
+    gui::{message::UiMessage, UserInterface, button::{Button, ButtonMessage}, UiNode},
     plugin::{Plugin, PluginContext, PluginRegistrationContext, error::GameResult},
 };
 
@@ -13,7 +15,9 @@ pub use fyrox;
 
 #[derive(Default, Visit, Reflect, Debug)]
 #[reflect(non_cloneable)]
-pub struct Game { }
+pub struct Game {
+    button: Option<Handle<UiNode>>,
+}
 
 impl Plugin for Game {
     fn register(&self, _context: PluginRegistrationContext) -> GameResult {
@@ -22,7 +26,7 @@ impl Plugin for Game {
     }
 
     fn init(&mut self, scene_path: Option<&str>, mut context: PluginContext) -> GameResult {
-        context.load_scene_or_ui::<Self>(scene_path.unwrap_or("main.ui"));
+        context.load_scene_or_ui::<Self>(scene_path.unwrap_or("data/scenes/main.ui"));
         Ok(())
     }
 
@@ -31,7 +35,7 @@ impl Plugin for Game {
         Ok(())
     }
 
-    fn update(&mut self, _context: &mut PluginContext) -> GameResult {
+    fn update(&mut self, context: &mut PluginContext) -> GameResult {
         // Add your global update code here.
         Ok(())
     }
@@ -47,11 +51,22 @@ impl Plugin for Game {
 
     fn on_ui_message(
         &mut self,
-        _context: &mut PluginContext,
-        _message: &UiMessage,
-        _ui_handle: Handle<UserInterface>
+        context: &mut PluginContext,
+        message: &UiMessage,
+        ui_handle: Handle<UserInterface>
     ) -> GameResult {
         // Handle UI events here.
+
+        let Some(ButtonMessage::Click) = message.data() else { return Ok(()); };
+
+        let Some((h, ui)) = context.user_interfaces.first().find_by_name_from_root("level1") else { return Ok(()); };
+
+        if message.destination() != h { return Ok(()); }
+
+        let Ok(ui) = context.user_interfaces.try_get(ui_handle) else { return Ok(()); };
+
+        Log::info(format!("按鈕是：{:?}", ui.node(h).name()));
+        context.load_scene_or_ui::<Self>("data/scenes/level.ui");
         Ok(())
     }
 }
