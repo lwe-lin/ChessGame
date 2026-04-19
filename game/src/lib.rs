@@ -11,18 +11,21 @@ use fyrox::{
 
 // Re-export the engine.
 pub use fyrox;
+use fyrox::gui::messagebox::MessageBoxResult::No;
 
 #[derive(Default, Visit, Reflect, Debug)]
 #[reflect(non_cloneable)]
 pub struct Game {
     button: Option<Handle<UiNode>>,
     main_ui: Handle<UserInterface>,
+
+    last_time_ui: Option<Handle<UserInterface>>,
 }
 
 impl Game{
     fn load_ui(&mut self, path: &str, context: &mut PluginContext) -> (){
         if self.main_ui.is_some(){
-            context.user_interfaces.remove(self.main_ui);
+            self.last_time_ui = Some(self.main_ui);
         }
 
         context.load_ui(path, |result, game: &mut Game, ctx | {
@@ -49,8 +52,12 @@ impl Plugin for Game {
         Ok(())
     }
 
-    fn update(&mut self, _context: &mut PluginContext) -> GameResult {
+    fn update(&mut self, context: &mut PluginContext) -> GameResult {
         // Add your global update code here.
+        if let Some(last_time_ui) = self.last_time_ui{
+            context.user_interfaces.remove(last_time_ui);
+            self.last_time_ui = None;
+        }
         Ok(())
     }
 
@@ -67,19 +74,24 @@ impl Plugin for Game {
         &mut self,
         context: &mut PluginContext,
         message: &UiMessage,
-        ui_handle: Handle<UserInterface>
+        _ui_handle: Handle<UserInterface>
     ) -> GameResult {
         // Handle UI events here.
 
+        // 如果不是按鈕點擊事件則直接回傳
         let Some(ButtonMessage::Click) = message.data() else { return Ok(()); };
 
-        let Some((h, ..)) = context.user_interfaces.first().find_by_name_from_root("level1") else { return Ok(()); };
+        // 緩存 message.destination() 的結果
+        let destination = message.destination();
+        if let Some((level1, ..)) = context.user_interfaces.first().find_by_name_from_root("level1") {
+            if destination != level1 { return Ok(()); }
+            self.load_ui("data/scenes/level.ui", context);
+        }
+        else if let Some((exit, ..)) = context.user_interfaces.first().find_by_name_from_root("exit") {
+            if destination != exit { return Ok(()) }
+            self.load_ui("data/scenes/main.ui", context);
+        };
 
-        if message.destination() != h { return Ok(()); }
-
-        let Ok(ui) = context.user_interfaces.try_get(ui_handle) else { return Ok(()); };
-
-        self.load_ui("data/scenes/level.ui", context);
         Ok(())
     }
 }
