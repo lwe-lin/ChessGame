@@ -10,6 +10,3 @@ fyrox = {workspace = true}
 [features]
 default = ["fyrox/default"]
 dylib-engine = ["fyrox/dylib"]
-
-[lib]
-crate-type = ["cdylib", "rlib"]
