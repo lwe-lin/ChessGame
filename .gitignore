@@ -31,3 +31,4 @@ Thumbs.db
 # 自己寫的
 **/target
 /settings.ron
+/executor-wasm/pkg/.gitignore
