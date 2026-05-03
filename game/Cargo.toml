@@ -10,3 +10,10 @@ fyrox = {workspace = true}
 [features]
 default = ["fyrox/default"]
 dylib-engine = ["fyrox/dylib"]
+
+# [profile.release]
+# opt-level = "z"            # 專注於縮小體積
+# lto = true                 # 連結時優化，移除未使用的程式碼（對大型引擎極其有效）
+# codegen-units = 1          # 雖然編譯變慢，但優化效果最好
+# panic = "abort"            # 移除錯誤回溯（Stack Traces），節省大量空間
+# strip = true               # 自動移除符號表（Symbols），這能砍掉數 MB
