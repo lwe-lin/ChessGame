@@ -1,6 +1,6 @@
 //! Game project.
 
-//pub mod checkerboard;
+// pub mod checkerboard;
 pub mod checkerboardBuilder;
 
 #[allow(unused_imports)]
