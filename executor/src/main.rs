@@ -1,7 +1,7 @@
 //! Executor with your game connected to it as a plugin.
+use fyrox::core::log::Log;
 use fyrox::engine::executor::Executor;
 use fyrox::event_loop::EventLoop;
-use fyrox::core::log::Log;
 
 fn main() {
     Log::set_file_name("chessgame.log");

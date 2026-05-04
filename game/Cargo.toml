@@ -6,11 +6,11 @@ edition = "2021"
 
 [dependencies]
 fyrox = {workspace = true}
+rand = "0.10.1"
 
 [features]
 default = ["fyrox/default"]
 dylib-engine = ["fyrox/dylib"]
-
 # [profile.release]
 # opt-level = "z"            # 專注於縮小體積
 # lto = true                 # 連結時優化，移除未使用的程式碼（對大型引擎極其有效）

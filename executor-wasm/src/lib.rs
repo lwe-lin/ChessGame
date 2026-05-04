@@ -1,6 +1,8 @@
 //! Executor with your game connected to it as a plugin.
 #![cfg(target_arch = "wasm32")]
 
+pub mod checkerboard;
+
 use fyrox::engine::executor::Executor;
 use fyrox::event_loop::EventLoop;
 use fyrox::core::wasm_bindgen::{self, prelude::*};
