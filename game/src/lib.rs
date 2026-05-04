@@ -189,7 +189,7 @@ impl Plugin for Game {
                 let Some((main, ..)) = context.user_interfaces.first().find_by_name_from_root("main") else { return  Ok(()); };
                 context.user_interfaces.first_mut().remove_node(main);
                 // self.load_ui("data/scenes/level.ui", context);
-                let _ = self.level(3, context);
+                let _ = self.level(2, context);
             }
         }
         if let Some((level2, ..)) = context
@@ -201,7 +201,7 @@ impl Plugin for Game {
                 let Some((main, ..)) = context.user_interfaces.first().find_by_name_from_root("main") else { return  Ok(()); };
                 context.user_interfaces.first_mut().remove_node(main);
                 // self.load_ui("data/scenes/level.ui", context);
-                let _ = self.level(2, context);
+                let _ = self.level(3, context);
             }
         }
         if let Some((exit, ..)) = context

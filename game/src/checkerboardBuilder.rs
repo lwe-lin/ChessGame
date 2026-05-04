@@ -156,7 +156,7 @@ impl CheckerboardBuilder {
             main = main.add_column(col);
         }
 
-        root = root.with_child(main.build(ctx));
+        // root = root.with_child(main.build(ctx));
 
         Self{
             itmes: result,
