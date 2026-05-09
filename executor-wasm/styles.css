@@ -68,3 +68,9 @@ body {
   transform-style: preserve-3d;
   background-color: yellowgreen;
 }
+
+canvas{
+  width: 1920px;
+  height: 1080px;
+  object-fit: contain;
+}
