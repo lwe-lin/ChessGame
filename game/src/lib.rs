@@ -1,7 +1,6 @@
 //! Game project.
 
-// pub mod checkerboard;
-pub mod checkerboardBuilder;
+pub mod checkerboard;
 
 #[allow(unused_imports)]
 use fyrox::{
@@ -19,13 +18,15 @@ use fyrox::{
         color::Color,
     },
     gui::{
-        button::Button,
-        button::ButtonMessage,
+        button::{
+            Button,
+            ButtonMessage,
+            ButtonBuilder,
+        },
         message::UiMessage,
         UiNode,
         UserInterface,
         BuildContext,
-        button::ButtonBuilder,
         text::TextBuilder,
         widget::WidgetBuilder,
         brush::Brush,
@@ -33,17 +34,22 @@ use fyrox::{
         HorizontalAlignment,
         Thickness,
         VerticalAlignment,
+        grid::{
+            Grid,
+            GridBuilder,
+            GridDimension
+        }
     },
     graph::prelude::*,
 };
 
 // Re-export the engine.
 pub use fyrox;
-use fyrox::gui::grid::GridBuilder;
 
 #[derive(Default, Visit, Reflect, Debug)]
 #[reflect(non_cloneable)]
 pub struct Game {
+    home_root: Handle<Grid>,
     main_ui: Handle<UserInterface>,
     last_time_ui: Option<Handle<UserInterface>>,
     grid: Handle<UiNode>,
@@ -104,7 +110,7 @@ impl Game {
         self.exit_button(exit_button);
 
         // 標題
-        TextBuilder::new(WidgetBuilder::new()
+        let title = TextBuilder::new(WidgetBuilder::new()
             .with_foreground(Brush::Solid(Color::BLACK).into())
             .with_height(100f32)
             .with_vertical_alignment(VerticalAlignment::Top)
@@ -122,10 +128,10 @@ impl Game {
             .with_horizontal_text_alignment(HorizontalAlignment::Center)
             .build(&mut ctx.user_interfaces.first_mut().build_ctx()
             );
-        
-        let mut root = WidgetBuilder::new().with_child(exit_button);
 
-        checkerboardBuilder::CheckerboardBuilder::new(size * 3, &mut root, &mut ctx.user_interfaces.first_mut().build_ctx());
+        let (_checkerboard, checkerboard_grid) = checkerboard::Checkerboard::init(size * 3, ctx);
+        let root_widget = WidgetBuilder::new().with_child(exit_button).with_child(title).with_child(checkerboard_grid);
+        self.home_root = GridBuilder::new(root_widget).add_row(GridDimension::stretch()).add_column(GridDimension::stretch()).build(&mut ctx.user_interfaces.first_mut().build_ctx());
         Ok(())
     }
 
