@@ -71,7 +71,7 @@ body {
 
 /* 自己編寫的 */
 canvas{
-  width: 300px;
+  width: 600px;
   height: 150px;
   object-fit: contain;
 }
