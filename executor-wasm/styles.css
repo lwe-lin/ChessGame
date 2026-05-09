@@ -68,10 +68,3 @@ body {
   transform-style: preserve-3d;
   background-color: yellowgreen;
 }
-
-/* 自己編寫的 */
-canvas{
-  width: 100vw;
-  height: 100vh;
-  object-fit: contain;
-}

@@ -171,11 +171,11 @@ impl Plugin for Game {
 
     fn on_os_event(&mut self, event: &Event<()>, context: PluginContext) -> GameResult {
         // Do something on OS event here.
-        if let Event::WindowEvent { event: WindowEvent::Resized(size), .. } = event{
-            if self.loaded{
-                context.user_interfaces.first_mut().set_screen_size(Vector2::new(size.width as f32, size.height as f32));
-            }
-        }
+        // if let Event::WindowEvent { event: WindowEvent::Resized(size), .. } = event{
+        //     if self.loaded{
+        //         context.user_interfaces.first_mut().set_screen_size(Vector2::new(size.width as f32, size.height as f32));
+        //     }
+        // }
         Ok(())
     }
 
