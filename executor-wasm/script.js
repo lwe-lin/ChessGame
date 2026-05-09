@@ -13,9 +13,9 @@ const callback = function(mutationsList, observer) {
             mutation.addedNodes.forEach(node => {
                 if(node.nodeType === Node.ELEMENT_NODE) {
                     if(node.tagName == "CANVAS"){
-                        querySelector("canvas").setAttribute('width', '1000');
-                        querySelector("canvas").setAttribute('height', '750');
-                        querySelector("canvas").style.cssText = "width: 800px; height: 600px;";
+                        document.querySelector("canvas").setAttribute('width', '1000');
+                        document.querySelector("canvas").setAttribute('height', '750');
+                        document.querySelector("canvas").style.cssText = "width: 800px; height: 600px;";
                     }
                 }
             });
