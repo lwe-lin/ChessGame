@@ -69,8 +69,6 @@ body {
   background-color: yellowgreen;
 }
 
-/* canvas{
-  width: 800px;
-  height: 600px;
-  object-fit: contain;
-} */
+body{
+  text-align: center;
+}
