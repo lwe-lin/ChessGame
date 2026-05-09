@@ -45,10 +45,13 @@ use fyrox::{
 
 // Re-export the engine.
 pub use fyrox;
+use fyrox::core::algebra::Vector2;
+use fyrox::event::WindowEvent;
 
 #[derive(Default, Visit, Reflect, Debug)]
 #[reflect(non_cloneable)]
 pub struct Game {
+    loaded: bool,
     home_root: Handle<Grid>,
     main_ui: Handle<UserInterface>,
     last_time_ui: Option<Handle<UserInterface>>,
@@ -166,8 +169,13 @@ impl Plugin for Game {
         Ok(())
     }
 
-    fn on_os_event(&mut self, _event: &Event<()>, _context: PluginContext) -> GameResult {
+    fn on_os_event(&mut self, event: &Event<()>, context: PluginContext) -> GameResult {
         // Do something on OS event here.
+        if let Event::WindowEvent { event: WindowEvent::Resized(size), .. } = event{
+            if self.loaded{
+                context.user_interfaces.first_mut().set_screen_size(Vector2::new(size.width as f32, size.height as f32));
+            }
+        }
         Ok(())
     }
 
