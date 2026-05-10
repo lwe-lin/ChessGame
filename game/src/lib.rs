@@ -16,9 +16,17 @@ use fyrox::{
     },
     core::{
         pool::Handle,
-        reflect::prelude::*,
-        visitor::prelude::*,
+        reflect::{
+            prelude::*,
+            Reflect,
+        },
+        visitor::{
+            prelude::*,
+            Visit,
+        },
         color::Color,
+        algebra::Vector2,
+        log::Log,
     },
     gui::{
         button::{
@@ -44,18 +52,13 @@ use fyrox::{
         }
     },
     graph::prelude::*,
+    event::WindowEvent,
 };
 
 // Re-export the engine.
 pub use fyrox;
-use fyrox::core::algebra::Vector2;
-use fyrox::core::log::Log;
-use fyrox::event::WindowEvent;
 use crate::checkerboard::Checkerboard;
-use fyrox::core::reflect::Reflect;
-use fyrox::core::visitor::Visit;
-use fyrox::rand::thread_rng;
-use rand::{random, RngExt};
+use rand::RngExt;
 
 #[derive(Default, Visit, Reflect, Debug)]
 #[reflect(non_cloneable)]
@@ -160,7 +163,7 @@ impl Game {
 
     fn random_level(&mut self, number: usize, context: &mut PluginContext){
         if let Some(checkerboard) = &mut self.main_checkerboard {
-            for i in 0..number {
+            for _i in 0..number {
                 let button_name = checkerboard.id_to_name(self.rand.random_range(0..checkerboard.size/3*4));
                 checkerboard.move_one_step(button_name.as_str());
             }

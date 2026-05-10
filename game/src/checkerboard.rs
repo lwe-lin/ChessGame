@@ -27,7 +27,6 @@ use fyrox::{
 };
 
 use std::collections::HashMap;
-use std::iter::chain;
 
 #[derive(Default, Debug)]
 pub struct Checkerboard {
@@ -233,12 +232,10 @@ impl Checkerboard {
             if point.y == 0 {
                 // 自己
                 let mut index1 = Self::index(self.size, point.x, 0);
-                // 下一個
-                let mut index2 = Self::index(self.size, point.x, 1);
                 let color1: Option<Color> = Some(self.items[index1]);
                 for i in 0..self.size-1 {
                     index1 = Self::index(self.size, point.x, i);
-                    index2 = Self::index(self.size, point.x, i+1);
+                    let index2 = Self::index(self.size, point.x, i+1);
                     let color2 = self.items[index2];
                     self.items[index1] = color2;
                 }
@@ -249,12 +246,10 @@ impl Checkerboard {
             if point.x == 0 {
                 // 自己
                 let mut index1 = Self::index(self.size, 0, point.y);
-                // 下一個
-                let mut index2 = Self::index(self.size, 1, 0);
                 let color1: Option<Color> = Some(self.items[index1]);
                 for i in 0..self.size-1 {
                     index1 = Self::index(self.size, i, point.y);
-                    index2 = Self::index(self.size, i+1, point.y);
+                    let index2 = Self::index(self.size, i+1, point.y);
                     let color2 = self.items[index2];
                     self.items[index1] = color2;
                 }
@@ -265,12 +260,10 @@ impl Checkerboard {
             if point.y == self.size-1 {
                 // 自己
                 let mut index1 = Self::index(self.size, point.x, self.size-1);
-                // 下一個
-                let mut index2 = Self::index(self.size, point.x, self.size-2);
                 let color1: Option<Color> = Some(self.items[index1]);
                 for i in (1..=self.size-1).rev() {
                     index1 = Self::index(self.size, point.x, i);
-                    index2 = Self::index(self.size, point.x, i-1);
+                    let index2 = Self::index(self.size, point.x, i-1);
                     let color2 = self.items[index2];
                     self.items[index1] = color2;
                 }
@@ -281,12 +274,10 @@ impl Checkerboard {
             if point.x == self.size-1 {
                 // 自己
                 let mut index1 = Self::index(self.size, self.size-1, point.y);
-                // 下一個
-                let mut index2 = Self::index(self.size, self.size-2, point.y);
                 let color1: Option<Color> = Some(self.items[index1]);
                 for i in (1..=self.size-1).rev() {
                     index1 = Self::index(self.size, i, point.y);
-                    index2 = Self::index(self.size, i-1, point.y);
+                    let index2 = Self::index(self.size, i-1, point.y);
                     let color2 = self.items[index2];
                     self.items[index1] = color2;
                 }
@@ -367,8 +358,8 @@ impl Checkerboard {
         for i in 0..self.size{
             ui.send(self.object[i], WidgetMessage::Remove);
         }
-        self.items.clone();
-        self.names.clone();
-        self.button_start.clone();
+        let _ = self.items.clone();
+        let _ = self.names.clone();
+        let _ = self.button_start.clone();
     }
 }
