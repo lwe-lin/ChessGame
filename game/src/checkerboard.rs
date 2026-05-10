@@ -30,7 +30,7 @@ pub struct Checkerboard {
     pub size: usize,
     pub items: Vec<Color>,
     _object: Vec<Handle<Border>>,
-    _names: Vec<String>,
+    names: Vec<String>,
     _button_start: HashMap<String, Point2<i32>>
 }
 
@@ -177,7 +177,7 @@ impl Checkerboard {
             size: size,
             items: result,
             _object: all_object,
-            _names: names,
+            names: names,
             _button_start: HashMap::new(),
         }, main.build(&mut context.user_interfaces.first_mut().build_ctx()))
     }
@@ -186,7 +186,7 @@ impl Checkerboard {
         size*y+x
     }
 
-    fn _update_color(&self, context: &mut PluginContext){
+    fn update_color(&self, context: &mut PluginContext){
         let size = self.size;
         for y in 0..size{
             for x in 0..size{
@@ -199,5 +199,9 @@ impl Checkerboard {
                 // let sender = ui.send(self.object[index], );
             }
         }
+    }
+
+    fn id_to_name(&self, id: usize) -> String{
+        self.names[id].clone()
     }
 }
