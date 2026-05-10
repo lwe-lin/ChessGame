@@ -1,4 +1,3 @@
-// use rand;
 use fyrox::{
     core::{
         color::Color,
@@ -12,7 +11,10 @@ use fyrox::{
             GridDimension,
             Grid,
         },
-        widget::WidgetBuilder,
+        widget::{
+            WidgetBuilder,
+            WidgetMessage
+        },
         Thickness,
         border::{
             BorderBuilder,
@@ -25,13 +27,15 @@ use fyrox::{
 };
 
 use std::collections::HashMap;
+use std::iter::chain;
 
+#[derive(Default, Debug)]
 pub struct Checkerboard {
     pub size: usize,
     pub items: Vec<Color>,
-    _object: Vec<Handle<Border>>,
+    object: Vec<Handle<Border>>,
     names: Vec<String>,
-    _button_start: HashMap<String, Point2<i32>>
+    button_start: HashMap<String, Point2<usize>>
 }
 
 impl Checkerboard {
@@ -53,6 +57,7 @@ impl Checkerboard {
         let button_size = 25f32;
 
         let mut names: Vec<String> = Vec::with_capacity(size*size);
+        let mut button_start: HashMap<String, Point2<usize>> = HashMap::new();
         for i in 0..s{
             // 上面的按鈕
             let mut name = format!("top{}", i);
@@ -67,6 +72,10 @@ impl Checkerboard {
                         .on_column(1+s+i))
                     .build(&mut context.user_interfaces.first_mut().build_ctx())
             );
+            if !button_start.contains_key(name.as_str()) {
+                button_start.insert(name.clone(), Point2::new(s+i, 0));
+            }
+
             // 左邊的按鈕
             name = format!("left{}", i);
             names.push(name.clone());
@@ -80,8 +89,13 @@ impl Checkerboard {
                         .on_column(0))
                     .build(&mut context.user_interfaces.first_mut().build_ctx())
             );
+            if !button_start.contains_key(name.as_str()) {
+                button_start.insert(name.clone(), Point2::new(0, s+i));
+            }
+
             // 下面的按鈕
             name = format!("bottom{}", i);
+            names.push(name.clone());
             main_widget = main_widget.with_child(
                 ButtonBuilder::new(
                     WidgetBuilder::new()
@@ -92,8 +106,12 @@ impl Checkerboard {
                         .on_column(1+s+i))
                     .build(&mut context.user_interfaces.first_mut().build_ctx())
             );
+            if !button_start.contains_key(name.as_str()) {
+                button_start.insert(name.clone(), Point2::new(s+i, size - 1));
+            }
+
             // 右邊的按鈕
-            name = format!("top{}", i);
+            name = format!("right{}", i);
             names.push(name.clone());
             main_widget = main_widget.with_child(
                 ButtonBuilder::new(
@@ -105,6 +123,9 @@ impl Checkerboard {
                         .on_column(size+1))
                     .build(&mut context.user_interfaces.first_mut().build_ctx())
             );
+            if !button_start.contains_key(name.as_str()) {
+                button_start.insert(name.clone(), Point2::new(size - 1, s+i));
+            }
         }
 
         // 初始化顏色
@@ -176,9 +197,9 @@ impl Checkerboard {
         (Self{
             size: size,
             items: result,
-            _object: all_object,
+            object: all_object,
             names: names,
-            _button_start: HashMap::new(),
+            button_start: button_start,
         }, main.build(&mut context.user_interfaces.first_mut().build_ctx()))
     }
 
@@ -186,22 +207,168 @@ impl Checkerboard {
         size*y+x
     }
 
-    fn update_color(&self, context: &mut PluginContext){
+    pub fn update_color(&self, context: &mut PluginContext){
         let size = self.size;
         for y in 0..size{
             for x in 0..size{
-                let index = Self::index(x, y, size);
+                let index = Self::index(size, x, y);
                 let color = self.items[index];
-                let ui = &mut *context.user_interfaces.first_mut();
-                let ui_node = ui.node_mut(self._object[index].to_base::<UiNode>());
-                let border = ui_node.cast_mut::<Border>().unwrap();
-                border.set_background(Brush::Solid(color));
-                // let sender = ui.send(self.object[index], );
+                let ui = context.user_interfaces.first();
+                // let ui_node = ui.node_mut(self._object[index].to_base::<UiNode>());
+                // let border = ui_node.cast_mut::<Border>().unwrap();
+                // border.set_background(Brush::Solid(color));
+                ui.send(self.object[index].to_base::<UiNode>(), WidgetMessage::Background(Brush::Solid(color).into()));
             }
         }
     }
 
-    fn id_to_name(&self, id: usize) -> String{
+    pub fn id_to_name(&self, id: usize) -> String{
         self.names[id].clone()
+    }
+
+    pub fn move_one_step(&mut self, name: &str){
+        if self.button_start.contains_key(name) {
+            let point = self.button_start[name];
+            // 上面的按鈕
+            if point.y == 0 {
+                // 自己
+                let mut index1 = Self::index(self.size, point.x, 0);
+                // 下一個
+                let mut index2 = Self::index(self.size, point.x, 1);
+                let color1: Option<Color> = Some(self.items[index1]);
+                for i in 0..self.size-1 {
+                    index1 = Self::index(self.size, point.x, i);
+                    index2 = Self::index(self.size, point.x, i+1);
+                    let color2 = self.items[index2];
+                    self.items[index1] = color2;
+                }
+                self.items[Self::index(self.size, point.x, self.size-1)] = color1.unwrap();
+            }
+
+            // 左邊的按鈕
+            if point.x == 0 {
+                // 自己
+                let mut index1 = Self::index(self.size, 0, point.y);
+                // 下一個
+                let mut index2 = Self::index(self.size, 1, 0);
+                let color1: Option<Color> = Some(self.items[index1]);
+                for i in 0..self.size-1 {
+                    index1 = Self::index(self.size, i, point.y);
+                    index2 = Self::index(self.size, i+1, point.y);
+                    let color2 = self.items[index2];
+                    self.items[index1] = color2;
+                }
+                self.items[Self::index(self.size, self.size-1, point.y)] = color1.unwrap();
+            }
+
+            // 下面的按鈕
+            if point.y == self.size-1 {
+                // 自己
+                let mut index1 = Self::index(self.size, point.x, self.size-1);
+                // 下一個
+                let mut index2 = Self::index(self.size, point.x, self.size-2);
+                let color1: Option<Color> = Some(self.items[index1]);
+                for i in (1..=self.size-1).rev() {
+                    index1 = Self::index(self.size, point.x, i);
+                    index2 = Self::index(self.size, point.x, i-1);
+                    let color2 = self.items[index2];
+                    self.items[index1] = color2;
+                }
+                self.items[Self::index(self.size, point.x, 0)] = color1.unwrap();
+            }
+
+            // 右邊的按鈕
+            if point.x == self.size-1 {
+                // 自己
+                let mut index1 = Self::index(self.size, self.size-1, point.y);
+                // 下一個
+                let mut index2 = Self::index(self.size, self.size-2, point.y);
+                let color1: Option<Color> = Some(self.items[index1]);
+                for i in (1..=self.size-1).rev() {
+                    index1 = Self::index(self.size, i, point.y);
+                    index2 = Self::index(self.size, i-1, point.y);
+                    let color2 = self.items[index2];
+                    self.items[index1] = color2;
+                }
+                self.items[Self::index(self.size, 0, point.y)] = color1.unwrap();
+            }
+        }
+    }
+
+    pub fn is_win(&self) -> bool{
+        let size = self.size/3;
+
+        let mut colors: Vec<Color> = Vec::with_capacity(size*size);
+        let mut number = 0;
+        // 上面
+        for y in 0..size{
+            for x in size..size*2{
+                let index = Self::index(self.size, x, y);
+                if !colors.contains(&self.items[index]) {
+                    colors.push(self.items[index]);
+                }
+            }
+        }
+        if colors.len() == 1 {
+            number += 1;
+        }
+
+        colors.clear();
+        // 左邊
+        for y in size..size*2{
+            for x in 0..size{
+                let index = Self::index(self.size, x, y);
+                if !colors.contains(&self.items[index]) {
+                    colors.push(self.items[index]);
+                }
+            }
+        }
+        if colors.len() == 1 {
+            number += 1;
+        }
+
+        colors.clear();
+        // 下面
+        for y in size*2..size*3{
+            for x in size..size*2{
+                let index = Self::index(self.size, x, y);
+                if !colors.contains(&self.items[index]) {
+                    colors.push(self.items[index]);
+                }
+            }
+        }
+        if colors.len() == 1 {
+            number += 1;
+        }
+
+        colors.clear();
+        // 右邊
+        for y in size..size*2{
+            for x in size*2..size*3{
+                let index = Self::index(self.size, x, y);
+                if !colors.contains(&self.items[index]) {
+                    colors.push(self.items[index]);
+                }
+            }
+        }
+        if colors.len() == 1 {
+            number += 1;
+        }
+
+        if number == 4 {
+            true
+        }else{
+            false
+        }
+    }
+
+    pub fn drop(&self, context: &mut PluginContext){
+        let ui = context.user_interfaces.first_mut();
+        for i in 0..self.size{
+            ui.send(self.object[i], WidgetMessage::Remove);
+        }
+        self.items.clone();
+        self.names.clone();
+        self.button_start.clone();
     }
 }
