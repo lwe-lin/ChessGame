@@ -50,18 +50,19 @@ use fyrox::{
             Grid,
             GridBuilder,
             GridDimension
-        }
+        },
+        border::BorderBuilder,
     },
     graph::prelude::*,
     event::WindowEvent,
 };
 
-// Re-export the engine.
-pub use fyrox;
-use fyrox::gui::border::BorderBuilder;
 use crate::checkerboard::Checkerboard;
 use crate::ui_components::UiComponents;
 use rand::RngExt;
+
+// Re-export the engine.
+pub use fyrox;
 
 #[derive(Default, Visit, Reflect, Debug)]
 #[reflect(non_cloneable)]
@@ -78,6 +79,7 @@ pub struct Game {
     #[reflect(hidden)]
     #[visit(skip)]
     rand: ThreadRng,
+    level_buttons: Option<Vec<Handle<Button>>>,
 }
 
 impl Game {
@@ -96,6 +98,8 @@ impl Game {
                 // let Some(grid) = ui_node.cast::<Grid>() else { return Ok(()); };
                 // game.grid = h;
             }
+
+            game.level_buttons = None;
             Ok(())
         });
     }
@@ -150,6 +154,11 @@ impl Plugin for Game {
     }
 
     fn init(&mut self, scene_path: Option<&str>, mut context: PluginContext) -> GameResult {
+        // self.landed = false;
+        self.level_buttons = None;
+
+        context.resource_manager.request::<Font>("data/fonts/Noto_Sans_TC/static/NotoSansTC-Bold.ttf");
+
         context.load_scene_or_ui::<Self>(scene_path.unwrap_or("data/scenes.rgs"));
         self.load_ui("data/scenes/main.ui", &mut context);
         self.rand = rand::rng();
@@ -188,6 +197,17 @@ impl Plugin for Game {
     ) -> GameResult {
         // Handle UI events here.
 
+        if self.level_buttons == None{
+            self.level_buttons = Some(UiComponents::level(context, 2));
+            if let Some(level_buttons) = &self.level_buttons {
+                for i in 0..level_buttons.len() {
+                    if let Some((level, ..)) = context.user_interfaces.first().find_by_name_from_root("Level") {
+                        context.user_interfaces.first_mut().link_nodes(level_buttons[i], level, false);
+                    }
+                }
+            }
+        }
+
         // 如果不是按鈕點擊事件則直接回傳
         let Some(ButtonMessage::Click) = message.data() else {
             return Ok(());
@@ -198,7 +218,7 @@ impl Plugin for Game {
         if let Some((level1, ..)) = context
             .user_interfaces
             .first()
-            .find_by_name_from_root("Level1")
+            .find_by_name_from_root("Level0")
         {
             if destination == level1 {
                 let Some((main, ..)) = context.user_interfaces.first().find_by_name_from_root("main") else { return  Ok(()); };
@@ -207,34 +227,26 @@ impl Plugin for Game {
                 self.random_level(3, context);
             }
         }
-        if let Some((level2, ..)) = context
-            .user_interfaces
-            .first()
-            .find_by_name_from_root("Level2")
-        {
-            if destination == level2 {
-                let Some((main, ..)) = context.user_interfaces.first().find_by_name_from_root("main") else { return  Ok(()); };
-                context.user_interfaces.first_mut().remove_node(main);
-                let _ = self.level(2, context);
-                self.random_level(5, context);
-            }
-        }
-        if destination == self.exit_button.unwrap()
-        {
-            if let Some(checkerboard) = &self.main_checkerboard {
-                checkerboard.drop(context);
-                self.main_checkerboard = None;
-            }
-            self.load_ui("data/scenes/main.ui", context);
-        }
 
-        if destination != self.exit_button.unwrap() {
-            if let Some(checkerboard) = &mut self.main_checkerboard {
-                if let Ok(button) = context.user_interfaces.first().try_get_node(destination) {
-                    checkerboard.move_one_step(button.cast::<Button>().unwrap().name());
-                    checkerboard.update_color(context);
-                    if checkerboard.is_win() {
-                        Log::info("過關");
+        if let Some(exit) = self.exit_button {
+            if destination == exit
+            {
+                if let Some(checkerboard) = &self.main_checkerboard {
+                    checkerboard.drop(context);
+                    self.main_checkerboard = None;
+                }
+
+                self.load_ui("data/scenes/main.ui", context);
+            }
+
+            if destination != exit {
+                if let Some(checkerboard) = &mut self.main_checkerboard {
+                    if let Ok(button) = context.user_interfaces.first().try_get_node(destination) {
+                        checkerboard.move_one_step(button.cast::<Button>().unwrap().name());
+                        checkerboard.update_color(context);
+                        if checkerboard.is_win() {
+                            Log::info("過關");
+                        }
                     }
                 }
             }
