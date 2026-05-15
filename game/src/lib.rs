@@ -1,6 +1,7 @@
 //! Game project.
 
 pub mod checkerboard;
+pub mod ui_components;
 
 use rand;
 use rand::rngs::ThreadRng;
@@ -57,7 +58,9 @@ use fyrox::{
 
 // Re-export the engine.
 pub use fyrox;
+use fyrox::gui::border::BorderBuilder;
 use crate::checkerboard::Checkerboard;
+use crate::ui_components::UiComponents;
 use rand::RngExt;
 
 #[derive(Default, Visit, Reflect, Debug)]
@@ -100,65 +103,33 @@ impl Game {
     // 關卡場景組件，為了確保所有創建過程都在自己的掌控，所以被迫選擇所有都由自己透過程式碼創建
     fn level(&mut self, size: usize, ctx: &mut PluginContext) -> Result<(), String>{
         // 退出按鈕
-        let exit_button =
-            ButtonBuilder::new(WidgetBuilder::new()
-                .with_name("Exit")
-                .with_width(100f32)
-                .with_height(50f32)
-                .with_vertical_alignment(VerticalAlignment::Top)
-                .with_horizontal_alignment(HorizontalAlignment::Left)
+        let exit_button = UiComponents::button(ctx, "Exit", "退出", 100f32, 50f32);
+
+        // 儲存退出按鈕的 Handle
+        self.exit_button = Some(exit_button);
+
+        // 標題
+        let title = UiComponents::title(ctx, "智能五色棋", 100f32);
+
+        let bottom = BorderBuilder::new(
+            WidgetBuilder::new()
+                .with_width(350f32)
+                .with_height(350f32)
                 .with_margin(Thickness{
-                    left: 20f32,
-                    top: 20f32,
+                    top: 150f32,
+                    left: 0f32,
                     right: 0f32,
                     bottom: 0f32,
                 })
-            )
-                .with_content(
-                    // 按鈕文本
-                    TextBuilder::new(WidgetBuilder::new()
-                        .with_foreground(Brush::Solid(Color::WHITE).into()))
-                        .with_font(ctx.resource_manager.request::<Font>("data/fonts/Noto_Sans_TC/static/NotoSansTC-Bold.ttf"))
-                        .with_text("退出")
-                        .with_font_size(25f32.into())
-                        .with_vertical_text_alignment(VerticalAlignment::Center)
-                        .with_horizontal_text_alignment(HorizontalAlignment::Center)
-                        .build(&mut ctx.user_interfaces.first_mut().build_ctx())
-                )
-                .build(&mut ctx.user_interfaces.first_mut().build_ctx());
+                .with_background(Brush::Solid(Color::BLACK).into())
+        ).build(&mut ctx.user_interfaces.first_mut().build_ctx());
 
-        // 儲存退出按鈕的 Handle
-        self.exit_button(exit_button);
-
-        // 標題
-        let title = TextBuilder::new(WidgetBuilder::new()
-            .with_foreground(Brush::Solid(Color::BLACK).into())
-            .with_height(100f32)
-            .with_vertical_alignment(VerticalAlignment::Top)
-            .with_margin(Thickness{
-                left: 0f32,
-                top: 50f32,
-                right: 0f32,
-                bottom: 0f32
-            })
-        )
-            .with_font(ctx.resource_manager.request::<Font>("data/fonts/Noto_Sans_TC/static/NotoSansTC-Bold.ttf"))
-            .with_text("智能五色棋")
-            .with_font_size(40f32.into())
-            .with_vertical_text_alignment(VerticalAlignment::Center)
-            .with_horizontal_text_alignment(HorizontalAlignment::Center)
-            .build(&mut ctx.user_interfaces.first_mut().build_ctx()
-            );
-
-        let (checkerboard, checkerboard_grid) = checkerboard::Checkerboard::init(size * 3, ctx);
+        let (checkerboard, checkerboard_grid) = Checkerboard::init(size * 3, ctx);
         self.main_checkerboard = Some(checkerboard);
-        let root_widget = WidgetBuilder::new().with_child(exit_button).with_child(title).with_child(checkerboard_grid);
+
+        let root_widget = WidgetBuilder::new().with_child(exit_button).with_child(title).with_child(bottom).with_child(checkerboard_grid);
         self.home_root = GridBuilder::new(root_widget).add_row(GridDimension::stretch()).add_column(GridDimension::stretch()).build(&mut ctx.user_interfaces.first_mut().build_ctx());
         Ok(())
-    }
-
-    fn exit_button(&mut self, button: Handle<Button>){
-        self.exit_button = Some(button);
     }
 
     fn random_level(&mut self, number: usize, context: &mut PluginContext){

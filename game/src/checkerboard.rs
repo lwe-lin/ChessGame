@@ -68,7 +68,8 @@ impl Checkerboard {
                         .with_width(button_size)
                         .with_height(button_size)
                         .on_row(0)
-                        .on_column(1+s+i))
+                        .on_column(1+s+i)
+                        .with_foreground(Brush::Solid(Color::WHITE).into()))
                     .build(&mut context.user_interfaces.first_mut().build_ctx())
             );
             if !button_start.contains_key(name.as_str()) {
@@ -128,7 +129,7 @@ impl Checkerboard {
         }
 
         // 初始化顏色
-        let mut result = vec![Color::BLACK; size * size];
+        let mut result = vec![Color::GRAY; size * size];
 
         // 定義顏色
         // 先暫時用白色
