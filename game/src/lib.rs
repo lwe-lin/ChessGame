@@ -92,13 +92,6 @@ impl Game {
         context.load_ui(path, move |result, game: &mut Game, ctx| {
             game.main_ui = ctx.user_interfaces.add(result?.payload);
 
-            if p == "data/scenes/level.ui" {
-                // let Some((h, ..)) = ctx.user_interfaces.first().find_by_name_from_root("Grid") else { return Ok(()); };
-                // let ui_node = ctx.user_interfaces.first().node(h);
-                // let Some(grid) = ui_node.cast::<Grid>() else { return Ok(()); };
-                // game.grid = h;
-            }
-
             game.level_buttons = None;
             Ok(())
         });
