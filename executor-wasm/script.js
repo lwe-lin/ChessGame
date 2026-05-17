@@ -13,9 +13,15 @@ const callback = function(mutationsList, observer) {
             mutation.addedNodes.forEach(node => {
                 if(node.nodeType === Node.ELEMENT_NODE) {
                     if(node.tagName == "CANVAS"){
-                        document.querySelector("canvas").setAttribute('width', '1000');
-                        document.querySelector("canvas").setAttribute('height', '750');
-                        document.querySelector("canvas").style.cssText = "width: 800px; height: 600px;";
+                        // document.querySelector("canvas").setAttribute('width', '1000');
+                        // document.querySelector("canvas").setAttribute('height', '750');
+                        // document.querySelector("canvas").style.cssText = "width: 800px; height: 600px;";
+                        const canvas = document.querySelector("canvas");
+                            window.addEventListener('resize', () => {
+                            canvas.setAttribute('width', window.innerWidth);
+                            canvas.setAttribute('height', window.innerHeight);
+                            canvas.style.cssText = `width: ${window.innerWidth}px; height: ${window.innerHeight}px;`;
+                        });
                     }
                 }
             });
