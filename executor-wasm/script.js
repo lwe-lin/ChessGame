@@ -18,9 +18,9 @@ const callback = function(mutationsList, observer) {
                         // document.querySelector("canvas").style.cssText = "width: 800px; height: 600px;";
                         const canvas = document.querySelector("canvas");
                             window.addEventListener('resize', () => {
-                            canvas.setAttribute('width', document.documentElement.clientWidth);
-                            canvas.setAttribute('height', document.documentElement.clientHeight);
-                            canvas.style.cssText = `width: ${document.documentElement.clientWidth-100}px; height: ${document.documentElement.clientHeight-50}px;`;
+                            canvas.setAttribute('width', canvas.clientWidth);
+                            canvas.setAttribute('height', canvas.clientHeight);
+                            canvas.style.cssText = `width: 100%; height: 100%;`;
                         });
                     }
                 }
