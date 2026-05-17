@@ -23,4 +23,4 @@ function resizeFyroxCanvas() {
 window.addEventListener("resize", resizeFyroxCanvas);
 
 // 由於 WASM 初始化需要時間，在載入後延遲一下再確保執行一次
-setTimeout(resizeFyroxCanvas, 500);
+setTimeout(resizeFyroxCanvas, 2000);
