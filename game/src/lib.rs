@@ -57,9 +57,6 @@ use fyrox::{
     event::WindowEvent,
 };
 
-#[cfg(target_arch = "wasm32")]
-use fyrox::window::Window;
-
 use crate::checkerboard::Checkerboard;
 use crate::ui_components::UiComponents;
 use rand::RngExt;
@@ -91,7 +88,6 @@ impl Game {
             self.last_time_ui = Some(self.main_ui);
         }
 
-        let p = path.to_string();
         context.load_ui(path, move |result, game: &mut Game, ctx| {
             game.main_ui = ctx.user_interfaces.add(result?.payload);
 
@@ -175,7 +171,7 @@ impl Plugin for Game {
         Ok(())
     }
 
-    fn on_os_event(&mut self, event: &Event<()>, context: PluginContext) -> GameResult {
+    fn on_os_event(&mut self, _event: &Event<()>, _context: PluginContext) -> GameResult {
         // Do something on OS event here.
         // if let Event::WindowEvent { event: WindowEvent::Resized(size), .. } = event{
         //     if self.loaded{

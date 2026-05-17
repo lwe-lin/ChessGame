@@ -8,6 +8,7 @@ edition = "2021"
 fyrox = {workspace = true}
 getrandom = { version = "0.4.2", features = ["wasm_js"] }
 rand = "0.10.1"
+winit = "0.30.13"
 
 [features]
 default = ["fyrox/default"]
