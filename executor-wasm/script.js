@@ -20,7 +20,7 @@ const callback = function(mutationsList, observer) {
                             window.addEventListener('resize', () => {
                             canvas.setAttribute('width', document.documentElement.clientWidth);
                             canvas.setAttribute('height', document.documentElement.clientHeight);
-                            canvas.style.cssText = `width: ${document.documentElement.clientWidth-200}px; height: ${document.documentElement.clientHeight-150}px;`;
+                            canvas.style.cssText = `width: ${document.documentElement.clientWidth-100}px; height: ${document.documentElement.clientHeight-50}px;`;
                         });
                     }
                 }
