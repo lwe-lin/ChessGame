@@ -13,6 +13,7 @@ const callback = function (mutationsList, observer) {
             mutation.addedNodes.forEach(node => {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     if (node.tagName == "CANVAS") {
+                        document.querySelector('html, body').style.backgroundColor = 'black';
                         function resizeFyroxCanvas() {
                             const canvas = document.querySelector('canvas');
                             if (!canvas) return;

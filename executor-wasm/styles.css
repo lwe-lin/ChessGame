@@ -70,10 +70,6 @@ body {
 }
 
 /* 自己添加的 */
-html, body {
-  background-color: black;
-}
-
 canvas {
   display: block;   /* 防止 canvas 預設以文字行內基準線對齊導致的底部 4px 空隙 */
 }
