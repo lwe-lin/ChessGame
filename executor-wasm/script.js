@@ -19,8 +19,8 @@ const callback = function(mutationsList, observer) {
                         const canvas = document.querySelector("canvas");
                             window.addEventListener('resize', () => {
                             canvas.setAttribute('width', window.innerWidth);
-                            canvas.setAttribute('height', document.documentElement.clientHeight);
-                            canvas.style.cssText = `width: ${document.documentElement.clientWidth-200}px; height: ${document.documentElement.clientHeight-150}px;`;
+                            canvas.setAttribute('height', window.innerHeight);
+                            canvas.style.cssText = `width: ${document.documentElement.clientWidth}px; height: ${document.documentElement.clientHeight}px;`;
                         });
                     }
                 }
